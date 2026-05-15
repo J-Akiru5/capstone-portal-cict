@@ -10,11 +10,13 @@
     "db:seed": "ts-node src/seed.ts"
   },
   "dependencies": {
-    "@prisma/client": "latest"
+    "@prisma/client": "^6.0.0",
+    "@supabase/supabase-js": "latest",
+    "dotenv": "latest"
   },
   "devDependencies": {
     "@capstone/typescript-config": "workspace:*",
-    "prisma": "latest",
+    "prisma": "^6.0.0",
     "ts-node": "latest",
     "typescript": "latest"
   }
