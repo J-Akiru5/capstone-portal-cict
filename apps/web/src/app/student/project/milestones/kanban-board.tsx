@@ -7,6 +7,9 @@ import { Badge } from "@capstone/ui/components/badge"
 import { Clock, CheckCircle2, AlertCircle, Plus } from "lucide-react"
 import { MilestoneStatus } from "@prisma/client"
 
+import { updateMilestoneStatus, createMilestone } from "./actions"
+import { toast } from "sonner"
+
 interface Milestone {
   id: string
   title: string
@@ -21,10 +24,12 @@ const COLUMNS = [
   { id: MilestoneStatus.COMPLETED, title: "Done", icon: <CheckCircle2 className="w-4 h-4 text-green-500" /> },
 ]
 
-export function KanbanBoard({ initialMilestones }: { initialMilestones: Milestone[] }) {
+export function KanbanBoard({ initialMilestones, projectId }: { initialMilestones: Milestone[], projectId: string }) {
   const [milestones, setMilestones] = useState(initialMilestones)
+  const [isAdding, setIsAdding] = useState(false)
+  const [newTitle, setNewTitle] = useState("")
 
-  const onDragEnd = (result: DropResult) => {
+  const onDragEnd = async (result: DropResult) => {
     if (!result.destination) return
 
     const { source, destination, draggableId } = result
@@ -32,12 +37,38 @@ export function KanbanBoard({ initialMilestones }: { initialMilestones: Mileston
     if (source.droppableId === destination.droppableId) return
 
     const newStatus = destination.droppableId as MilestoneStatus
+    
+    // Optimistic Update
+    const oldMilestones = [...milestones]
     const updatedMilestones = milestones.map(m => 
       m.id === draggableId ? { ...m, status: newStatus } : m
     )
-    
     setMilestones(updatedMilestones)
-    // TODO: Call Server Action to sync with DB
+
+    try {
+      await updateMilestoneStatus(draggableId, newStatus)
+      toast.success("Status updated")
+    } catch (error) {
+      setMilestones(oldMilestones)
+      toast.error("Failed to update status")
+    }
+  }
+
+  const handleAddMilestone = async () => {
+    if (!newTitle.trim()) return
+    
+    try {
+      const created = await createMilestone({
+        title: newTitle,
+        projectId
+      })
+      setMilestones([...milestones, created])
+      setNewTitle("")
+      setIsAdding(false)
+      toast.success("Task added")
+    } catch (error) {
+      toast.error("Failed to add task")
+    }
   }
 
   return (
@@ -96,9 +127,31 @@ export function KanbanBoard({ initialMilestones }: { initialMilestones: Mileston
                   {provided.placeholder}
                   
                   {col.id === MilestoneStatus.TODO && (
-                    <button className="w-full py-3 border-2 border-dashed rounded-lg text-muted-foreground hover:text-primary hover:border-primary hover:bg-primary/5 transition-all flex items-center justify-center gap-2 text-xs font-medium mt-2">
-                      <Plus className="w-4 h-4" /> Add Task
-                    </button>
+                    <div className="mt-2">
+                      {isAdding ? (
+                        <div className="bg-card p-3 rounded-lg border shadow-sm animate-in zoom-in-95">
+                          <input
+                            autoFocus
+                            className="w-full text-xs p-2 rounded border mb-2 outline-none focus:ring-1 focus:ring-primary"
+                            placeholder="What needs to be done?"
+                            value={newTitle}
+                            onChange={(e) => setNewTitle(e.target.value)}
+                            onKeyDown={(e) => e.key === "Enter" && handleAddMilestone()}
+                          />
+                          <div className="flex gap-2">
+                            <Button size="sm" className="h-7 text-[10px]" onClick={handleAddMilestone}>Save</Button>
+                            <Button size="sm" variant="ghost" className="h-7 text-[10px]" onClick={() => setIsAdding(false)}>Cancel</Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button 
+                          onClick={() => setIsAdding(true)}
+                          className="w-full py-3 border-2 border-dashed rounded-lg text-muted-foreground hover:text-primary hover:border-primary hover:bg-primary/5 transition-all flex items-center justify-center gap-2 text-xs font-medium"
+                        >
+                          <Plus className="w-4 h-4" /> Add Task
+                        </button>
+                      )}
+                    </div>
                   )}
                 </div>
               )}

@@ -31,3 +31,5 @@ export const deleteFile = async (
   const { error } = await supabase.storage.from(bucket).remove([path])
   return { error }
 }
+
+export * from "./converter"

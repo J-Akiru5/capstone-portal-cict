@@ -42,7 +42,7 @@ export default async function MilestonesPage() {
           <p className="text-muted-foreground">Please propose a title first to enable milestone tracking.</p>
         </Card>
       ) : (
-        <KanbanBoard initialMilestones={milestones} />
+        <KanbanBoard initialMilestones={milestones} projectId={project.id} />
       )}
     </div>
   )

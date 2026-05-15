@@ -95,9 +95,16 @@ export default async function DocumentsPage() {
                             </div>
                           </div>
                         </div>
-                        <Button size="icon" variant="ghost">
-                          <Download className="w-4 h-4" />
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <Link href={`/student/project/documents/view/${v.id}`}>
+                            <Button size="icon" variant="ghost" title="View Manuscript">
+                              <FileText className="w-4 h-4" />
+                            </Button>
+                          </Link>
+                          <Button size="icon" variant="ghost" title="Download">
+                            <Download className="w-4 h-4" />
+                          </Button>
+                        </div>
                       </div>
                     ))
                   )}

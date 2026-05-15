@@ -14,10 +14,13 @@
     "@capstone/storage": "workspace:*",
     "@capstone/ui": "workspace:*",
     "@hello-pangea/dnd": "^18.0.1",
-    "lucide-react": "latest",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.16.0",
+    "mammoth": "^1.12.0",
     "next": "latest",
     "react": "latest",
-    "react-dom": "latest"
+    "react-dom": "latest",
+    "tailwind-merge": "^2.3.0"
   },
   "devDependencies": {
     "@capstone/eslint-config": "workspace:*",
