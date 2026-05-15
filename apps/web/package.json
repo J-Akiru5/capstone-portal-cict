@@ -14,6 +14,9 @@
     "@capstone/storage": "workspace:*",
     "@capstone/ui": "workspace:*",
     "@hello-pangea/dnd": "^18.0.1",
+    "@prisma/client": "^6.0.0",
+    "@supabase/auth-helpers-nextjs": "^0.15.0",
+    "@supabase/supabase-js": "^2.105.4",
     "clsx": "^2.1.1",
     "lucide-react": "^1.16.0",
     "mammoth": "^1.12.0",
@@ -21,6 +24,7 @@
     "react": "latest",
     "react-dom": "latest",
     "recharts": "^3.8.1",
+    "sonner": "^2.0.7",
     "tailwind-merge": "^2.6.1"
   },
   "devDependencies": {

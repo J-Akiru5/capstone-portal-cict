@@ -1,0 +1,164 @@
+
+> @capstone/web@0.1.0 build S:\Dev\Monorepo\capstone-portal\apps\web
+> next build
+
+▲ Next.js 16.2.6 (Turbopack)
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+Turbopack build encountered 1 warnings:
+[externals]/@prisma/client
+unexpected export *
+export * used with module [externals]/@prisma/client [external] (@prisma/client, cjs, [project]/node_modules/.pnpm/@prisma+client@6.19.3_prisma@6.19.3_typescript@6.0.3__typescript@6.0.3/node_modules/@prisma/client) which is a CommonJS module with exports only available at runtime
+List all export names manually (`export { a, b, c } from "...") or rewrite the module to ESM, to avoid the additional runtime code.`
+
+Import traces:
+  #1 [external]:
+    [externals]/@prisma/client [external]
+    ./apps/web/src/app/student/project/milestones/actions.ts [Server Component]
+
+  #2 [external]:
+    [externals]/@prisma/client [external]
+    ./packages/database/src/index.ts [Server Component]
+    ./apps/web/src/app/student/project/milestones/page.tsx [Server Component]
+
+  #3 [external]:
+    [externals]/@prisma/client [external]
+    ./apps/web/src/app/student/project/milestones/kanban-board.tsx [Client Component SSR]
+    ./apps/web/src/app/student/project/milestones/kanban-board.tsx [Server Component]
+    ./apps/web/src/app/student/project/milestones/page.tsx [Server Component]
+
+
+
+> Build error occurred
+Error: Turbopack build failed with 6 errors:
+./apps/web/src/app/globals.css
+Error evaluating Node.js code
+Error: Cannot find module '@tailwindcss/postcss'
+Require stack:
+- S:\Dev\Monorepo\capstone-portal\apps\web\.next\build\chunks\[root-of-the-server]__0cstldc._.js
+- S:\Dev\Monorepo\capstone-portal\apps\web\.next\build\chunks\[turbopack]_runtime.js
+- S:\Dev\Monorepo\capstone-portal\apps\web\.next\build\postcss.js
+    [at Module._resolveFilename (node:internal/modules/cjs/loader:1456:15)]
+    [at defaultResolveImpl (node:internal/modules/cjs/loader:1066:19)]
+    [at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1071:22)]
+    [at Module._load (node:internal/modules/cjs/loader:1242:25)]
+    [at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)]
+    [at Module.require (node:internal/modules/cjs/loader:1556:12)]
+    [at require (node:internal/modules/helpers:152:16)]
+    at require (turbopack:///[turbopack-node]/transforms/postcss.ts:49:25) [S:\Dev\Monorepo\capstone-portal\apps\web\.next\build\chunks\[root-of-the-server]__0cstldc._.js:134:33]
+    [at <anonymous>]
+    at map (turbopack:///[turbopack-node]/transforms/postcss.ts:43:33) [S:\Dev\Monorepo\capstone-portal\apps\web\.next\build\chunks\[root-of-the-server]__0cstldc._.js:129:35]
+
+Import trace:
+  Client Component Browser:
+    ./apps/web/src/app/globals.css [Client Component Browser]
+    ./apps/web/src/app/layout.tsx [Server Component]
+
+
+./packages/ui/src/styles/globals.css
+Error evaluating Node.js code
+Error: Cannot find module '@tailwindcss/postcss'
+Require stack:
+- S:\Dev\Monorepo\capstone-portal\apps\web\.next\build\chunks\[root-of-the-server]__0cstldc._.js
+- S:\Dev\Monorepo\capstone-portal\apps\web\.next\build\chunks\[turbopack]_runtime.js
+- S:\Dev\Monorepo\capstone-portal\apps\web\.next\build\postcss.js
+    [at Module._resolveFilename (node:internal/modules/cjs/loader:1456:15)]
+    [at defaultResolveImpl (node:internal/modules/cjs/loader:1066:19)]
+    [at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1071:22)]
+    [at Module._load (node:internal/modules/cjs/loader:1242:25)]
+    [at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)]
+    [at Module.require (node:internal/modules/cjs/loader:1556:12)]
+    [at require (node:internal/modules/helpers:152:16)]
+    at require (turbopack:///[turbopack-node]/transforms/postcss.ts:49:25) [S:\Dev\Monorepo\capstone-portal\apps\web\.next\build\chunks\[root-of-the-server]__0cstldc._.js:134:33]
+    [at <anonymous>]
+    at map (turbopack:///[turbopack-node]/transforms/postcss.ts:43:33) [S:\Dev\Monorepo\capstone-portal\apps\web\.next\build\chunks\[root-of-the-server]__0cstldc._.js:129:35]
+
+Import trace:
+  Client Component Browser:
+    ./packages/ui/src/styles/globals.css [Client Component Browser]
+    ./apps/web/src/app/layout.tsx [Server Component]
+
+
+./apps/web/src/app/student/project/documents/page.tsx:7:1
+Module not found: Can't resolve 'date-fns'
+  [90m 5 |[0m [36mimport[0m { [33mUploadForm[0m } [36mfrom[0m [32m"./upload-form"[0m
+  [90m 6 |[0m [36mimport[0m { [33mFileText[0m, [33mDownload[0m, [33mHistory[0m, [33mClock[0m } [36mfrom[0m [32m"lucide-react"[0m
+[31m[1m>[0m [90m 7 |[0m [36mimport[0m { formatDistanceToNow } [36mfrom[0m [32m"date-fns"[0m
+  [90m   |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m 8 |[0m
+  [90m 9 |[0m [36mexport[0m [36mdefault[0m [36masync[0m [36mfunction[0m [33mDocumentsPage[0m() {
+  [90m10 |[0m   [36mconst[0m supabase = createServerClient()
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./packages/auth/src/index.ts:1:1
+Export createClientComponentClient doesn't exist in target module
+[31m[1m>[0m [90m1 |[0m ... createClientComponentClient, createServerComponentClient } [36mfrom[0m [32m"@supabase/auth-helpers...[0m
+  [90m  |[0m    [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m2 |[0m ... cookies } [36mfrom[0m [32m"next/headers"[0m
+  [90m3 |[0m ...
+  [90m4 |[0m ...[36monst[0m createClient = () => createClientComponentClient()
+
+The export createClientComponentClient was not found in module [project]/node_modules/.pnpm/@supabase+auth-helpers-nextjs@0.15.0_@supabase+supabase-js@2.105.4/node_modules/@supabase/auth-helpers-nextjs/dist/module/index.js [app-rsc] (ecmascript).
+Did you mean to import createServerClient?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  #1 [Server Component]:
+    ./packages/auth/src/index.ts
+    ./apps/web/src/app/student/project/milestones/page.tsx
+
+  #2 [Server Component]:
+    ./packages/auth/src/index.ts
+    ./apps/web/src/app/student/project/title-check/actions.ts
+
+
+./apps/web/src/middleware.ts:1:1
+Export createMiddlewareClient doesn't exist in target module
+[31m[1m>[0m [90m1 |[0m [36mimport[0m { createMiddlewareClient } [36mfrom[0m [32m"@supabase/auth-helpers-nextjs"[0m
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m2 |[0m [36mimport[0m { [33mNextResponse[0m } [36mfrom[0m [32m"next/server"[0m
+  [90m3 |[0m [36mimport[0m [36mtype[0m { [33mNextRequest[0m } [36mfrom[0m [32m"next/server"[0m
+  [90m4 |[0m
+
+The export createMiddlewareClient was not found in module [project]/node_modules/.pnpm/@supabase+auth-helpers-nextjs@0.15.0_@supabase+supabase-js@2.105.4/node_modules/@supabase/auth-helpers-nextjs/dist/module/index.js [middleware-edge] (ecmascript).
+Did you mean to import createServerClient?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+
+./packages/auth/src/index.ts:1:1
+Export createServerComponentClient doesn't exist in target module
+[31m[1m>[0m [90m1 |[0m ... createClientComponentClient, createServerComponentClient } [36mfrom[0m [32m"@supabase/auth-helpers...[0m
+  [90m  |[0m    [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m2 |[0m ... cookies } [36mfrom[0m [32m"next/headers"[0m
+  [90m3 |[0m ...
+  [90m4 |[0m ...[36monst[0m createClient = () => createClientComponentClient()
+
+The export createServerComponentClient was not found in module [project]/node_modules/.pnpm/@supabase+auth-helpers-nextjs@0.15.0_@supabase+supabase-js@2.105.4/node_modules/@supabase/auth-helpers-nextjs/dist/module/index.js [app-rsc] (ecmascript).
+Did you mean to import createServerClient?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  #1 [Server Component]:
+    ./packages/auth/src/index.ts
+    ./apps/web/src/app/student/project/milestones/page.tsx
+
+  #2 [Server Component]:
+    ./packages/auth/src/index.ts
+    ./apps/web/src/app/student/project/title-check/actions.ts
+
+
+    at require (turbopack:///[turbopack-node]/transforms/postcss.ts:49:25) [S:\Dev\Monorepo\capstone-portal\apps\web\.next\build\chunks\[root-of-the-server]__0cstldc._.js:134:33])
+    at map (turbopack:///[turbopack-node]/transforms/postcss.ts:43:33) [S:\Dev\Monorepo\capstone-portal\apps\web\.next\build\chunks\[root-of-the-server]__0cstldc._.js:129:35])
+    at require (turbopack:///[turbopack-node]/transforms/postcss.ts:49:25) [S:\Dev\Monorepo\capstone-portal\apps\web\.next\build\chunks\[root-of-the-server]__0cstldc._.js:134:33])
+    at map (turbopack:///[turbopack-node]/transforms/postcss.ts:43:33) [S:\Dev\Monorepo\capstone-portal\apps\web\.next\build\chunks\[root-of-the-server]__0cstldc._.js:129:35])
+    at <unknown> (./apps/web/src/app/student/project/documents/page.tsx:7:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (./packages/auth/src/index.ts:1:1)
+    at <unknown> (./apps/web/src/middleware.ts:1:1)
+    at <unknown> (./packages/auth/src/index.ts:1:1)
+ ELIFECYCLE  Command failed with exit code 1.
