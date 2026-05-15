@@ -1,0 +1,14 @@
+{
+  "name": "@capstone/eslint-config",
+  "version": "0.0.0",
+  "private": true,
+  "files": [
+    "next.js",
+    "library.js"
+  ],
+  "dependencies": {
+    "eslint-config-next": "latest",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-react": "^7.34.1"
+  }
+}

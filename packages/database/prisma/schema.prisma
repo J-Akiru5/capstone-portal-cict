@@ -1,0 +1,289 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  STUDENT
+  FACULTY
+  ADMIN
+}
+
+enum FacultyPosition {
+  INSTRUCTOR
+  PROGRAM_CHAIR
+  DEAN
+}
+
+enum GroupStatus {
+  FORMING
+  ACTIVE
+  COMPLETED
+  DISSOLVED
+}
+
+enum DefenseStage {
+  TITLE
+  PRE_ORAL
+  TECHNICAL
+  FINAL
+}
+
+enum ProjectStatus {
+  TITLE_PROPOSAL
+  TITLE_APPROVED
+  IN_PROGRESS
+  PRE_ORAL_STAGE
+  TECHNICAL_STAGE
+  FINAL_STAGE
+  COMPLETED
+  ARCHIVED
+}
+
+enum MilestoneStatus {
+  TODO
+  IN_PROGRESS
+  FOR_REVIEW
+  DONE
+}
+
+enum PanelStatus {
+  NOMINATED
+  CONFIRMED
+  DECLINED
+}
+
+enum DocType {
+  DOCX
+  PDF
+}
+
+enum AnnotationType {
+  COMMENT
+  SUGGESTION
+  CORRECTION
+  MUST_FIX
+}
+
+enum DefenseVerdict {
+  PASS
+  CONDITIONAL
+  FAIL
+}
+
+model User {
+  id               String          @id @default(uuid())
+  email            String          @unique
+  firstName        String
+  lastName         String
+  role             UserRole
+  facultyPosition  FacultyPosition?
+  avatarUrl        String?
+  studentNumber    String?
+  department       String           @default("CICT")
+  isActive         Boolean          @default(true)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  advisedGroups    CapstoneGroup[]  @relation("Adviser")
+  groupMemberships GroupMember[]
+  panelAssignments PanelAssignment[]
+  evaluations      Evaluation[]
+  annotations      DocumentAnnotation[]
+  notifications    Notification[]
+  uploadedDocuments DocumentVersion[]
+}
+
+model CapstoneGroup {
+  id        String      @id @default(uuid())
+  name      String?
+  adviserId String?
+  status    GroupStatus @default(FORMING)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  adviser   User?         @relation("Adviser", fields: [adviserId], references: [id])
+  members   GroupMember[]
+  project   CapstoneProject?
+}
+
+model GroupMember {
+  id      String @id @default(uuid())
+  groupId String
+  userId  String
+  isLeader Boolean @default(false)
+
+  group CapstoneGroup @relation(fields: [groupId], references: [id])
+  user  User          @relation(fields: [userId], references: [id])
+
+  @@unique([groupId, userId])
+}
+
+model CapstoneProject {
+  id                  String        @id @default(uuid())
+  groupId             String        @unique
+  title               String
+  abstract            String?
+  techStack           String[]      @default([])
+  domain              String?
+  status              ProjectStatus @default(TITLE_PROPOSAL)
+  currentDefenseStage DefenseStage?
+  isPublic            Boolean       @default(false)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  group             CapstoneGroup       @relation(fields: [groupId], references: [id])
+  panelAssignments  PanelAssignment[]
+  documentVersions  DocumentVersion[]
+  milestones        Milestone[]
+  defenseSchedules  DefenseSchedule[]
+  evaluations       Evaluation[]
+}
+
+model PanelAssignment {
+  id        String      @id @default(uuid())
+  projectId String
+  userId    String
+  status    PanelStatus @default(NOMINATED)
+  isMandatory Boolean   @default(false)
+
+  project CapstoneProject @relation(fields: [projectId], references: [id])
+  user    User            @relation(fields: [userId], references: [id])
+
+  @@unique([projectId, userId])
+}
+
+model DocumentVersion {
+  id            String   @id @default(uuid())
+  projectId     String
+  versionNumber Int
+  fileName      String
+  fileUrl       String
+  fileType      DocType
+  fileSize      BigInt
+  htmlContent   String?
+  defenseStage  DefenseStage?
+  uploadedBy    String
+  createdAt     DateTime @default(now())
+
+  project     CapstoneProject      @relation(fields: [projectId], references: [id])
+  uploader    User                 @relation(fields: [uploadedBy], references: [id])
+  annotations DocumentAnnotation[]
+
+  @@unique([projectId, versionNumber])
+}
+
+model DocumentAnnotation {
+  id                String         @id @default(uuid())
+  documentVersionId String
+  authorId          String
+  paragraphIndex    Int
+  selectedText      String?
+  startOffset       Int?
+  endOffset         Int?
+  comment           String
+  annotationType    AnnotationType @default(COMMENT)
+  isResolved        Boolean        @default(false)
+  resolvedBy        String?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  documentVersion DocumentVersion @relation(fields: [documentVersionId], references: [id])
+  author          User            @relation(fields: [authorId], references: [id])
+}
+
+model Milestone {
+  id          String          @id @default(uuid())
+  projectId   String
+  title       String
+  description String?
+  status      MilestoneStatus @default(TODO)
+  order       Int
+  dueDate     DateTime?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  project CapstoneProject @relation(fields: [projectId], references: [id])
+}
+
+model EvaluationRubric {
+  id           String       @id @default(uuid())
+  defenseStage DefenseStage
+  isActive     Boolean      @default(true)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  criteria     RubricCriterion[]
+  evaluations  Evaluation[]
+}
+
+model RubricCriterion {
+  id          String @id @default(uuid())
+  rubricId    String
+  name        String
+  description String?
+  maxScore    Int    @default(10)
+  weight      Float  @default(1.0)
+
+  rubric      EvaluationRubric @relation(fields: [rubricId], references: [id])
+}
+
+model Evaluation {
+  id          String         @id @default(uuid())
+  projectId   String
+  rubricId    String
+  panelistId  String
+  verdict     DefenseVerdict
+  totalScore  Float
+  createdAt   DateTime       @default(now())
+
+  project     CapstoneProject  @relation(fields: [projectId], references: [id])
+  rubric      EvaluationRubric @relation(fields: [rubricId], references: [id])
+  panelist    User             @relation(fields: [panelistId], references: [id])
+  scores      EvaluationScore[]
+}
+
+model EvaluationScore {
+  id           String @id @default(uuid())
+  evaluationId String
+  criterionId  String
+  score        Float
+  comment      String?
+
+  evaluation   Evaluation @relation(fields: [evaluationId], references: [id])
+}
+
+model DefenseSchedule {
+  id           String       @id @default(uuid())
+  projectId    String
+  defenseStage DefenseStage
+  dateTime     DateTime
+  venue        String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  project CapstoneProject @relation(fields: [projectId], references: [id])
+}
+
+model HistoricalTitle {
+  id        String   @id @default(uuid())
+  title     String
+  year      Int
+  createdAt DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  type      String
+  message   String
+  link      String?
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+}
