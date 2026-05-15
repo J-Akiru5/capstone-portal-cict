@@ -131,7 +131,7 @@ importers:
   packages/database:
     dependencies:
       '@prisma/client':
-        specifier: ^6.0.0
+        specifier: ^6.19.3
         version: 6.19.3(prisma@6.19.3(typescript@6.0.3))(typescript@6.0.3)
       '@supabase/supabase-js':
         specifier: latest
