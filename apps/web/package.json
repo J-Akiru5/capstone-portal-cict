@@ -20,7 +20,8 @@
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "tailwind-merge": "^2.3.0"
+    "recharts": "^3.8.1",
+    "tailwind-merge": "^2.6.1"
   },
   "devDependencies": {
     "@capstone/eslint-config": "workspace:*",
