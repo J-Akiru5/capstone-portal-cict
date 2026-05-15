@@ -36,6 +36,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
+    "@tailwindcss/postcss": "^4.0.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
