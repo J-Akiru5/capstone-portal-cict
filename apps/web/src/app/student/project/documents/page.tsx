@@ -2,9 +2,11 @@ import { createServerClient } from "@capstone/auth"
 import { prisma } from "@capstone/database"
 import { Card, CardHeader, CardTitle, CardContent } from "@capstone/ui/components/card"
 import { Badge } from "@capstone/ui/components/badge"
+import { Button } from "@capstone/ui/components/button"
 import { UploadForm } from "./upload-form"
 import { FileText, Download, History, Clock } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
+import Link from "next/link"
 
 export default async function DocumentsPage() {
   const supabase = createServerClient()

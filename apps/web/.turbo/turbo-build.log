@@ -101,7 +101,7 @@ Export createClientComponentClient doesn't exist in target module
   [90m  |[0m    [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
   [90m2 |[0m ... cookies } [36mfrom[0m [32m"next/headers"[0m
   [90m3 |[0m ...
-  [90m4 |[0m ...[36monst[0m createClient = () => createClientComponentClient()
+  [90m4 |[0m ...pabaseUrl = process.env.[33mNEXT_PUBLIC_SUPABASE_URL[0m || process.env.[33mNEXT_PUBLIC_NEXT_SUPABAS...[0m
 
 The export createClientComponentClient was not found in module [project]/node_modules/.pnpm/@supabase+auth-helpers-nextjs@0.15.0_@supabase+supabase-js@2.105.4/node_modules/@supabase/auth-helpers-nextjs/dist/module/index.js [app-rsc] (ecmascript).
 Did you mean to import createServerClient?
@@ -136,7 +136,7 @@ Export createServerComponentClient doesn't exist in target module
   [90m  |[0m    [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
   [90m2 |[0m ... cookies } [36mfrom[0m [32m"next/headers"[0m
   [90m3 |[0m ...
-  [90m4 |[0m ...[36monst[0m createClient = () => createClientComponentClient()
+  [90m4 |[0m ...pabaseUrl = process.env.[33mNEXT_PUBLIC_SUPABASE_URL[0m || process.env.[33mNEXT_PUBLIC_NEXT_SUPABAS...[0m
 
 The export createServerComponentClient was not found in module [project]/node_modules/.pnpm/@supabase+auth-helpers-nextjs@0.15.0_@supabase+supabase-js@2.105.4/node_modules/@supabase/auth-helpers-nextjs/dist/module/index.js [app-rsc] (ecmascript).
 Did you mean to import createServerClient?
