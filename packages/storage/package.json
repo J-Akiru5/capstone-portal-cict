@@ -1,0 +1,14 @@
+{
+  "name": "@capstone/storage",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@supabase/supabase-js": "latest"
+  },
+  "devDependencies": {
+    "@capstone/typescript-config": "workspace:*",
+    "typescript": "latest"
+  }
+}

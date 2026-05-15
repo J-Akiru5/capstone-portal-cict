@@ -1,0 +1,32 @@
+{
+  "name": "@capstone/web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "@capstone/ui": "workspace:*",
+    "@capstone/auth": "workspace:*",
+    "@capstone/database": "workspace:*",
+    "@capstone/storage": "workspace:*",
+    "lucide-react": "latest"
+  },
+  "devDependencies": {
+    "@capstone/typescript-config": "workspace:*",
+    "@capstone/eslint-config": "workspace:*",
+    "@serwist/next": "latest",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
