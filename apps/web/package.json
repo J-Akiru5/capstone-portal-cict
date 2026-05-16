@@ -14,7 +14,6 @@
     "@capstone/storage": "workspace:*",
     "@capstone/ui": "workspace:*",
     "@hello-pangea/dnd": "^18.0.1",
-    "@supabase/auth-helpers-nextjs": "^0.15.0",
     "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.105.4",
     "clsx": "^2.1.1",
