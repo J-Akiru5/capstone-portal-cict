@@ -3,10 +3,15 @@ import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
 export async function middleware(req: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request: req })
-  
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.error("Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY env vars")
+    return NextResponse.next({ request: req })
+  }
+
+  let supabaseResponse = NextResponse.next({ request: req })
 
   const supabase = createServerClient(supabaseUrl!, supabaseAnonKey!, {
     cookies: {
