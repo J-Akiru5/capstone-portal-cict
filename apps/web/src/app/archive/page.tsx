@@ -8,13 +8,13 @@ import Link from "next/link"
 export default async function PublicArchivePage({
   searchParams,
 }: {
-  searchParams: { q?: string, domain?: string }
+  searchParams: Promise<{ q?: string, domain?: string }>
 }) {
   const { q, domain } = await searchParams
 
   const projects = await prisma.capstoneProject.findMany({
     where: {
-      status: "APPROVED", // Only public/completed projects
+      isPublic: true,
       ...(q ? {
         title: { contains: q, mode: 'insensitive' }
       } : {}),
@@ -30,12 +30,12 @@ export default async function PublicArchivePage({
 
   return (
     <div className="bg-muted/30 min-h-screen">
-      <div className="bg-maroon-800 text-white py-16">
+      <div className="bg-primary text-white py-16">
         <div className="max-w-7xl mx-auto px-8 text-center space-y-6">
           <h1 className="text-4xl md:text-5xl font-black font-outfit uppercase tracking-tighter">
             CICT Institutional Research Archive
           </h1>
-          <p className="text-maroon-100 max-w-2xl mx-auto text-lg">
+          <p className="text-primary-foreground/70 max-w-2xl mx-auto text-lg">
             Discover and explore institutional knowledge from the Iloilo State University of Fisheries Science and Technology.
           </p>
           
@@ -44,10 +44,10 @@ export default async function PublicArchivePage({
             <input 
               name="q"
               defaultValue={q}
-              className="w-full h-14 pl-12 pr-32 rounded-full border-none shadow-2xl text-gray-900 focus:ring-4 focus:ring-maroon-500/20 text-lg outline-none"
+              className="w-full h-14 pl-12 pr-32 rounded-full border-none shadow-2xl text-gray-900 focus:ring-4 focus:ring-primary/20 text-lg outline-none"
               placeholder="Search by title, technology, or domain..."
             />
-            <Button className="absolute right-2 top-2 bottom-2 rounded-full px-8 bg-maroon-700 hover:bg-maroon-600">
+            <Button className="absolute right-2 top-2 bottom-2 rounded-full px-8 bg-primary/90 hover:bg-primary">
               Search
             </Button>
           </form>

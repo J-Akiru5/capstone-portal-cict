@@ -1,4 +1,4 @@
-import { createServerClient } from "@capstone/auth"
+import { createServerClient } from "@capstone/auth/server"
 import { prisma } from "@capstone/database"
 import { Button } from "@capstone/ui/components/button"
 import Link from "next/link"
@@ -7,7 +7,7 @@ import { Badge } from "@capstone/ui/components/badge"
 import { FileText, Users, Calendar, CheckCircle2 } from "lucide-react"
 
 export default async function StudentDashboard() {
-  const supabase = createServerClient()
+  const supabase = await createServerClient()
   const { data: { session } } = await supabase.auth.getSession()
 
   if (!session) return null
@@ -15,7 +15,7 @@ export default async function StudentDashboard() {
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
     include: {
-      groups: {
+      groupMemberships: {
         include: {
           group: {
             include: {
@@ -29,7 +29,7 @@ export default async function StudentDashboard() {
     }
   })
 
-  const group = user?.groups[0]?.group
+  const group = user?.groupMemberships[0]?.group
   const project = group?.project
 
   return (

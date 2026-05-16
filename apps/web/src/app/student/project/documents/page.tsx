@@ -1,4 +1,4 @@
-import { createServerClient } from "@capstone/auth"
+import { createServerClient } from "@capstone/auth/server"
 import { prisma } from "@capstone/database"
 import { Card, CardHeader, CardTitle, CardContent } from "@capstone/ui/components/card"
 import { Badge } from "@capstone/ui/components/badge"
@@ -9,7 +9,7 @@ import { formatDistanceToNow } from "date-fns"
 import Link from "next/link"
 
 export default async function DocumentsPage() {
-  const supabase = createServerClient()
+  const supabase = await createServerClient()
   const { data: { session } } = await supabase.auth.getSession()
 
   if (!session) return null
@@ -86,7 +86,7 @@ export default async function DocumentsPage() {
                               {v.fileName}
                             </p>
                             <div className="flex items-center gap-2 text-[10px] text-muted-foreground mt-1">
-                              <Badge variant="outline" className="text-[8px] h-4">v{v.version}</Badge>
+                              <Badge variant="outline" className="text-[8px] h-4">v{v.versionNumber}</Badge>
                               <span>•</span>
                               <span className="flex items-center gap-1">
                                 <Clock className="w-3 h-3" /> 

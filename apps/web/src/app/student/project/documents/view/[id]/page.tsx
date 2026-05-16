@@ -1,4 +1,6 @@
-import { createServerClient } from "@capstone/auth"
+export const dynamic = "force-dynamic"
+
+import { createServerClient } from "@capstone/auth/server"
 import { prisma } from "@capstone/database"
 import { convertDocxToHtml } from "@capstone/storage"
 import { DocumentViewer } from "@capstone/ui/components/document-viewer"
@@ -7,9 +9,9 @@ import { ArrowLeft, Download, FileText } from "lucide-react"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 
-export default async function ViewDocumentPage({ params }: { params: { id: string } }) {
+export default async function ViewDocumentPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const supabase = createServerClient()
+  const supabase = await createServerClient()
 
   const version = await prisma.documentVersion.findUnique({
     where: { id },
@@ -53,7 +55,7 @@ export default async function ViewDocumentPage({ params }: { params: { id: strin
             <div>
               <h1 className="font-bold text-lg leading-none">{version.fileName}</h1>
               <p className="text-xs text-muted-foreground mt-1 uppercase tracking-tighter">
-                Version {version.version} • {version.docType}
+                Version {version.versionNumber} • {version.fileType}
               </p>
             </div>
           </div>

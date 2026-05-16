@@ -231,6 +231,7 @@ model RubricCriterion {
   weight      Float  @default(1.0)
 
   rubric      EvaluationRubric @relation(fields: [rubricId], references: [id])
+  scores      EvaluationScore[]
 }
 
 model Evaluation {
@@ -255,7 +256,8 @@ model EvaluationScore {
   score        Float
   comment      String?
 
-  evaluation   Evaluation @relation(fields: [evaluationId], references: [id])
+  evaluation   Evaluation      @relation(fields: [evaluationId], references: [id])
+  criterion    RubricCriterion @relation(fields: [criterionId], references: [id])
 }
 
 model DefenseSchedule {

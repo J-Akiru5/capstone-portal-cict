@@ -1,4 +1,6 @@
-import { createServerClient } from "@capstone/auth"
+export const dynamic = "force-dynamic"
+
+import { createServerClient } from "@capstone/auth/server"
 import { prisma } from "@capstone/database"
 import { convertDocxToHtml } from "@capstone/storage"
 import { AnnotationClient } from "./annotation-client"
@@ -7,9 +9,9 @@ import { ArrowLeft, ExternalLink } from "lucide-react"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 
-export default async function EvaluateManuscriptPage({ params }: { params: { versionId: string } }) {
+export default async function EvaluateManuscriptPage({ params }: { params: Promise<{ versionId: string }> }) {
   const { versionId } = await params
-  const supabase = createServerClient()
+  const supabase = await createServerClient()
 
   const version = await prisma.documentVersion.findUnique({
     where: { id: versionId },
@@ -55,7 +57,7 @@ export default async function EvaluateManuscriptPage({ params }: { params: { ver
                 Evaluating: {version.project.title}
               </h1>
               <p className="text-xs text-muted-foreground mt-1 uppercase tracking-wider">
-                Group: {version.project.group.name} • {version.docType} v{version.version}
+                Group: {version.project.group.name} • {version.fileType} v{version.versionNumber}
               </p>
             </div>
           </div>

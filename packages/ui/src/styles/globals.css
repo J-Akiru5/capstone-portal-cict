@@ -1,6 +1,8 @@
 @import "tailwindcss";
 
 @theme {
+  --color-background: #ffffff;
+  --color-foreground: #09090b;
   --color-primary: #800000; /* Maroon */
   --color-primary-foreground: #ffffff;
   

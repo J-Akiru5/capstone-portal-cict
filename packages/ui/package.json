@@ -4,7 +4,8 @@
   "private": true,
   "exports": {
     "./styles.css": "./src/styles/globals.css",
-    "./components/*": "./src/components/*.tsx"
+    "./components/*": "./src/components/*.tsx",
+    "./lib/*": "./src/lib/*.ts"
   },
   "scripts": {
     "lint": "eslint .",
@@ -25,6 +26,8 @@
   "devDependencies": {
     "@capstone/typescript-config": "workspace:*",
     "@capstone/eslint-config": "workspace:*",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
     "tailwindcss": "^4.0.0",
     "typescript": "latest"
   }

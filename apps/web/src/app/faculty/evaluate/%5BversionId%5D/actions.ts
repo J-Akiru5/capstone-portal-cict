@@ -1,6 +1,6 @@
 "use server"
 
-import { createServerClient } from "@capstone/auth"
+import { createServerClient } from "@capstone/auth/server"
 import { prisma } from "@capstone/database"
 import { revalidatePath } from "next/cache"
 
@@ -10,16 +10,18 @@ export async function saveAnnotation(data: {
   content: string
   selectedText?: string
 }) {
-  const supabase = createServerClient()
+  const supabase = await createServerClient()
   const { data: { session } } = await supabase.auth.getSession()
 
   if (!session) throw new Error("Unauthorized")
 
-  const annotation = await prisma.annotation.create({
+  const paragraphIndex = parseInt(data.paragraphId.replace("p-", ""))
+
+  const annotation = await prisma.documentAnnotation.create({
     data: {
-      versionId: data.versionId,
-      paragraphId: data.paragraphId,
-      content: data.content,
+      documentVersionId: data.versionId,
+      paragraphIndex: paragraphIndex,
+      comment: data.content,
       selectedText: data.selectedText,
       authorId: session.user.id
     }
@@ -30,12 +32,12 @@ export async function saveAnnotation(data: {
 }
 
 export async function deleteAnnotation(id: string, versionId: string) {
-  const supabase = createServerClient()
+  const supabase = await createServerClient()
   const { data: { session } } = await supabase.auth.getSession()
 
   if (!session) throw new Error("Unauthorized")
 
-  await prisma.annotation.delete({
+  await prisma.documentAnnotation.delete({
     where: { id }
   })
 

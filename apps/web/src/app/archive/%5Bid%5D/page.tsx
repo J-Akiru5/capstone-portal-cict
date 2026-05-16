@@ -1,12 +1,14 @@
+export const dynamic = "force-dynamic"
+
 import { prisma } from "@capstone/database"
 import { Card, CardHeader, CardTitle, CardContent } from "@capstone/ui/components/card"
 import { Button } from "@capstone/ui/components/button"
 import { Badge } from "@capstone/ui/components/badge"
-import { Download, Users, FileText, ArrowLeft, GraduationCap, MapPin, Globe } from "lucide-react"
+import { Download, Users, FileText, ArrowLeft, GraduationCap, MapPin, Globe, Calendar as CalendarIcon } from "lucide-react"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 
-export default async function ProjectDetailPage({ params }: { params: { id: string } }) {
+export default async function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
 
   const project = await prisma.capstoneProject.findUnique({
@@ -19,10 +21,10 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
         }
       },
       documentVersions: {
-        orderBy: { version: "desc" },
+        orderBy: { versionNumber: "desc" },
         take: 1
       },
-      panelists: { include: { user: true } }
+      panelAssignments: { include: { user: true } }
     }
   })
 
@@ -49,10 +51,10 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
           </h1>
 
           <div className="flex flex-wrap gap-8 pt-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <Calendar className="w-5 h-5 text-primary" />
-              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <CalendarIcon className="w-5 h-5 text-primary" />
+                </div>
               <div>
                 <p className="text-[10px] uppercase font-bold text-muted-foreground">Publication Year</p>
                 <p className="font-bold text-sm">{new Date(project.createdAt).getFullYear()}</p>
@@ -64,7 +66,7 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
               </div>
               <div>
                 <p className="text-[10px] uppercase font-bold text-muted-foreground">Adviser</p>
-                <p className="font-bold text-sm">Prof. {project.group.adviser.lastName}</p>
+                <p className="font-bold text-sm">Prof. {project.group.adviser?.lastName ?? "TBA"}</p>
               </div>
             </div>
           </div>
@@ -98,7 +100,7 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
                           </div>
                           <div>
                             <p className="text-sm font-bold">{m.user.firstName} {m.user.lastName}</p>
-                            <p className="text-[10px] text-muted-foreground">{m.role}</p>
+                            <p className="text-[10px] text-muted-foreground">{m.isLeader ? "Leader" : "Member"}</p>
                           </div>
                         </div>
                       ))}
@@ -107,7 +109,7 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
                   <div>
                     <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-4">The Panel</h3>
                     <div className="space-y-4">
-                      {project.panelists.map(p => (
+                      {project.panelAssignments.map(p => (
                         <div key={p.id} className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-full bg-primary/5 flex items-center justify-center text-xs font-bold text-primary">
                             {p.user.firstName[0]}
@@ -169,7 +171,4 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
   )
 }
 
-function Calendar({ className }: any) {
-  return <CalendarIcon className={className} />
-}
-import { Calendar as CalendarIcon } from "lucide-react"
+

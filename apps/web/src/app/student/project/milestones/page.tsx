@@ -1,10 +1,10 @@
-import { createServerClient } from "@capstone/auth"
+import { createServerClient } from "@capstone/auth/server"
 import { prisma } from "@capstone/database"
 import { KanbanBoard } from "./kanban-board"
 import { Card, CardHeader, CardTitle, CardContent } from "@capstone/ui/components/card"
 
 export default async function MilestonesPage() {
-  const supabase = createServerClient()
+  const supabase = await createServerClient()
   const { data: { session } } = await supabase.auth.getSession()
 
   if (!session) return null

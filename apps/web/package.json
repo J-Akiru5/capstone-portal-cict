@@ -14,8 +14,8 @@
     "@capstone/storage": "workspace:*",
     "@capstone/ui": "workspace:*",
     "@hello-pangea/dnd": "^18.0.1",
-    "@prisma/client": "^6.0.0",
     "@supabase/auth-helpers-nextjs": "^0.15.0",
+    "@supabase/ssr": "^0.10.3",
     "@supabase/supabase-js": "^2.105.4",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
@@ -32,11 +32,11 @@
     "@capstone/eslint-config": "workspace:*",
     "@capstone/typescript-config": "workspace:*",
     "@serwist/next": "latest",
+    "@tailwindcss/postcss": "^4.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "@tailwindcss/postcss": "^4.0.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

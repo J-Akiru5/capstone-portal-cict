@@ -1,4 +1,6 @@
-import { createServerClient } from "@capstone/auth"
+export const dynamic = "force-dynamic"
+
+import { createServerClient } from "@capstone/auth/server"
 import { prisma, DefenseStage } from "@capstone/database"
 import { Card, CardHeader, CardTitle, CardContent } from "@capstone/ui/components/card"
 import { Button } from "@capstone/ui/components/button"
@@ -6,7 +8,7 @@ import { Badge } from "@capstone/ui/components/badge"
 import { CheckCircle2, AlertCircle, Trophy, ClipboardCheck } from "lucide-react"
 import { notFound } from "next/navigation"
 
-export default async function ProjectGradingPage({ params }: { params: { projectId: string } }) {
+export default async function ProjectGradingPage({ params }: { params: Promise<{ projectId: string }> }) {
   const { projectId } = await params
   
   const project = await prisma.capstoneProject.findUnique({
@@ -16,8 +18,7 @@ export default async function ProjectGradingPage({ params }: { params: { project
 
   if (!project) notFound()
 
-  // For this demo, we'll assume we are grading the TITLE_DEFENSE
-  const activeStage = DefenseStage.TITLE_DEFENSE
+  const activeStage = DefenseStage.TITLE
   
   const rubric = await prisma.evaluationRubric.findFirst({
     where: { defenseStage: activeStage },

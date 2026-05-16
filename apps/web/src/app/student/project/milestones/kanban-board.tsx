@@ -4,8 +4,9 @@ import { useState } from "react"
 import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd"
 import { Card, CardHeader, CardTitle, CardContent } from "@capstone/ui/components/card"
 import { Badge } from "@capstone/ui/components/badge"
+import { Button } from "@capstone/ui/components/button"
 import { Clock, CheckCircle2, AlertCircle, Plus } from "lucide-react"
-import { MilestoneStatus } from "@prisma/client"
+import { MilestoneStatus } from "@capstone/database"
 
 import { updateMilestoneStatus, createMilestone } from "./actions"
 import { toast } from "sonner"
@@ -21,7 +22,7 @@ interface Milestone {
 const COLUMNS = [
   { id: MilestoneStatus.TODO, title: "To Do", icon: <Clock className="w-4 h-4" /> },
   { id: MilestoneStatus.IN_PROGRESS, title: "In Progress", icon: <AlertCircle className="w-4 h-4 text-amber-500" /> },
-  { id: MilestoneStatus.COMPLETED, title: "Done", icon: <CheckCircle2 className="w-4 h-4 text-green-500" /> },
+  { id: MilestoneStatus.DONE, title: "Done", icon: <CheckCircle2 className="w-4 h-4 text-green-500" /> },
 ]
 
 export function KanbanBoard({ initialMilestones, projectId }: { initialMilestones: Milestone[], projectId: string }) {
@@ -163,6 +164,4 @@ export function KanbanBoard({ initialMilestones, projectId }: { initialMilestone
   )
 }
 
-function cn(...classes: any[]) {
-  return classes.filter(Boolean).join(" ")
-}
+import { cn } from "@capstone/ui/lib/utils"

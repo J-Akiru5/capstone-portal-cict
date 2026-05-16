@@ -1,4 +1,4 @@
-import { prisma, DefenseStage, EvaluationVerdict } from "@capstone/database"
+import { prisma, DefenseVerdict } from "@capstone/database"
 
 export async function getDashboardStats() {
   const [
@@ -18,7 +18,7 @@ export async function getDashboardStats() {
       _count: true
     }),
     prisma.evaluation.findMany({
-      select: { stage: true, verdict: true }
+      select: { verdict: true, totalScore: true, rubric: { select: { defenseStage: true } } }
     }),
     prisma.milestone.findMany({
       select: { status: true, dueDate: true }
@@ -31,16 +31,17 @@ export async function getDashboardStats() {
   // 1. Process Domain Distribution
   const domainMap: Record<string, number> = {}
   projects.forEach(p => {
-    domainMap[p.domain] = (domainMap[p.domain] || 0) + 1
+    if (p.domain) domainMap[p.domain] = (domainMap[p.domain] || 0) + 1
   })
   const domainData = Object.entries(domainMap).map(([name, value]) => ({ name, value }))
 
   // 2. Process Pass Rates per Stage
   const stageStats: Record<string, { total: number, passed: number }> = {}
   evaluations.forEach(e => {
-    if (!stageStats[e.stage]) stageStats[e.stage] = { total: 0, passed: 0 }
-    stageStats[e.stage].total++
-    if (e.verdict === EvaluationVerdict.PASS) stageStats[e.stage].passed++
+    const stage = e.rubric?.defenseStage || "UNKNOWN"
+    if (!stageStats[stage]) stageStats[stage] = { total: 0, passed: 0 }
+    stageStats[stage].total++
+    if (e.verdict === DefenseVerdict.PASS) stageStats[stage].passed++
   })
   const passRateData = Object.entries(stageStats).map(([stage, stats]) => ({
     stage: stage.replace(/_/g, " "),
@@ -60,7 +61,7 @@ export async function getDashboardStats() {
       totalProjects,
       totalStudents,
       totalFaculty,
-      completionRate: Math.round((projectsByStatus.find(s => s.status === 'APPROVED')?._count || 0) / totalProjects * 100) || 0
+      completionRate: Math.round((projectsByStatus.find(s => s.status === 'COMPLETED')?._count || 0) / totalProjects * 100) || 0
     },
     domainData,
     passRateData,

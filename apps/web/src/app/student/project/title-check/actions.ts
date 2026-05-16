@@ -1,6 +1,6 @@
 "use server"
 
-import { createServerClient } from "@capstone/auth"
+import { createServerClient } from "@capstone/auth/server"
 import { redirect } from "next/navigation"
 import { prisma } from "@capstone/database"
 
@@ -27,7 +27,7 @@ export async function checkTitleSimilarity(title: string) {
 }
 
 export async function submitTitleProposal(title: string, abstract: string) {
-  const supabase = createServerClient()
+  const supabase = await createServerClient()
   const { data: { session } } = await supabase.auth.getSession()
 
   if (!session) throw new Error("Unauthorized")
