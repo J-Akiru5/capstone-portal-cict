@@ -2,10 +2,11 @@
 
 import { createClient } from "@capstone/auth"
 import { Button } from "@capstone/ui/components/button"
+import { Input } from "@capstone/ui/components/input"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@capstone/ui/components/card"
 import { useState } from "react"
 import Link from "next/link"
-import { GraduationCap } from "lucide-react"
+import { GraduationCap, Eye, EyeOff } from "lucide-react"
 
 const roles = [
   { value: "STUDENT", label: "Student", desc: "Access capstone projects and submit manuscripts" },
@@ -17,6 +18,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
   const [role, setRole] = useState("STUDENT")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -64,119 +66,146 @@ export default function RegisterPage() {
 
   if (success) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-              <GraduationCap className="h-6 w-6 text-green-600" />
-            </div>
-            <CardTitle className="text-2xl font-outfit">Registration Successful</CardTitle>
-            <CardDescription>
-              Your account has been created. You can now sign in to access the portal.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-3">
-            <Button asChild className="w-full">
-              <Link href="/login">Sign In</Link>
-            </Button>
-            <Button asChild variant="ghost" className="w-full">
-              <Link href="/">Back to Home</Link>
-            </Button>
-          </CardContent>
-        </Card>
-      </main>
+      <div className="min-h-screen flex flex-col">
+        <header className="border-b bg-white">
+          <div className="container mx-auto flex h-14 items-center px-4">
+            <Link href="/" className="flex items-center gap-2">
+              <div className="flex h-7 w-7 items-center justify-center rounded bg-primary">
+                <GraduationCap className="h-4 w-4 text-primary-foreground" />
+              </div>
+              <span className="text-sm font-bold text-primary">ISUFST Capstone Portal</span>
+            </Link>
+          </div>
+        </header>
+        <main className="flex-1 flex items-center justify-center bg-gradient-to-b from-primary/5 to-background p-4">
+          <Card className="w-full max-w-sm">
+            <CardHeader className="text-center pb-4">
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+                <GraduationCap className="h-6 w-6 text-green-600" />
+              </div>
+              <CardTitle className="text-xl font-outfit">Registration Successful</CardTitle>
+              <CardDescription>
+                Your account has been created. You can now sign in to access the portal.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-3">
+              <Button asChild className="w-full">
+                <Link href="/login">Sign In</Link>
+              </Button>
+              <Button asChild variant="ghost" className="w-full">
+                <Link href="/">Back to Home</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </main>
+      </div>
     )
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-outfit">Create Account</CardTitle>
-          <CardDescription>Register for the ISUFST Capstone Portal</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleRegister} className="space-y-4">
-            {error && (
-              <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg">
-                {error}
-              </div>
-            )}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Email</label>
-              <input
+    <div className="min-h-screen flex flex-col">
+      <header className="border-b bg-white">
+        <div className="container mx-auto flex h-14 items-center px-4">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="flex h-7 w-7 items-center justify-center rounded bg-primary">
+              <GraduationCap className="h-4 w-4 text-primary-foreground" />
+            </div>
+            <span className="text-sm font-bold text-primary">ISUFST Capstone Portal</span>
+          </Link>
+        </div>
+      </header>
+      <main className="flex-1 flex items-center justify-center bg-gradient-to-b from-primary/5 to-background p-4">
+        <Card className="w-full max-w-sm">
+          <CardHeader className="text-center pb-4">
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+              <GraduationCap className="h-6 w-6 text-primary" />
+            </div>
+            <CardTitle className="text-xl font-outfit">Create Account</CardTitle>
+            <CardDescription>Register for the ISUFST Capstone Portal</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleRegister} className="space-y-4">
+              {error && (
+                <div className="flex items-start gap-2 p-3 text-sm text-destructive bg-destructive/5 border border-destructive/20 rounded-lg">
+                  <span>{error}</span>
+                </div>
+              )}
+              <Input
+                label="Email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full p-2.5 rounded-lg border focus:ring-2 focus:ring-primary outline-none"
                 placeholder="you@isufst.edu.ph"
                 required
               />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full p-2.5 rounded-lg border focus:ring-2 focus:ring-primary outline-none"
-                placeholder="At least 6 characters"
-                required
-                minLength={6}
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Confirm Password</label>
-              <input
+              <div className="relative">
+                <Input
+                  label="Password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="At least 6 characters"
+                  required
+                  minLength={6}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-[34px] text-muted-foreground hover:text-foreground"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+              <Input
+                label="Confirm Password"
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full p-2.5 rounded-lg border focus:ring-2 focus:ring-primary outline-none"
                 placeholder="Re-enter your password"
                 required
                 minLength={6}
               />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Role</label>
-              <div className="grid gap-2">
-                {roles.map((r) => (
-                  <label
-                    key={r.value}
-                    className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                      role === r.value
-                        ? "border-primary bg-primary/5"
-                        : "border-border hover:border-primary/50"
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="role"
-                      value={r.value}
-                      checked={role === r.value}
-                      onChange={() => setRole(r.value)}
-                      className="mt-0.5 accent-primary"
-                    />
-                    <div>
-                      <span className="text-sm font-medium">{r.label}</span>
-                      <span className="block text-xs text-muted-foreground">{r.desc}</span>
-                    </div>
-                  </label>
-                ))}
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">Role</label>
+                <div className="grid gap-2">
+                  {roles.map((r) => (
+                    <label
+                      key={r.value}
+                      className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                        role === r.value
+                          ? "border-primary bg-primary/5"
+                          : "border-border hover:border-primary/50"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="role"
+                        value={r.value}
+                        checked={role === r.value}
+                        onChange={() => setRole(r.value)}
+                        className="mt-0.5 accent-primary"
+                      />
+                      <div>
+                        <span className="text-sm font-medium">{r.label}</span>
+                        <span className="block text-xs text-muted-foreground">{r.desc}</span>
+                      </div>
+                    </label>
+                  ))}
+                </div>
               </div>
-            </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Creating account..." : "Create Account"}
-            </Button>
-          </form>
-          <p className="text-center text-sm text-muted-foreground mt-6">
-            Already have an account?{" "}
-            <Link href="/login" className="text-primary font-medium hover:underline">
-              Sign in
-            </Link>
-          </p>
-        </CardContent>
-      </Card>
-    </main>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Creating account..." : "Create Account"}
+              </Button>
+            </form>
+            <p className="text-center text-sm text-muted-foreground mt-6">
+              Already have an account?{" "}
+              <Link href="/login" className="text-primary font-medium hover:underline">
+                Sign in
+              </Link>
+            </p>
+          </CardContent>
+        </Card>
+      </main>
+    </div>
   )
 }
