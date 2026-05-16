@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@caps
 import { useState } from "react"
 import Link from "next/link"
 import { GraduationCap, Eye, EyeOff } from "lucide-react"
+import { createUserProfile } from "./actions"
 
 const roles = [
   { value: "STUDENT", label: "Student", desc: "Access capstone projects and submit manuscripts" },
@@ -15,6 +16,8 @@ const roles = [
 ]
 
 export default function RegisterPage() {
+  const [firstName, setFirstName] = useState("")
+  const [lastName, setLastName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -28,6 +31,15 @@ export default function RegisterPage() {
     e.preventDefault()
     setLoading(true)
     setError(null)
+
+    const trimmedFirstName = firstName.trim()
+    const trimmedLastName = lastName.trim()
+
+    if (!trimmedFirstName || !trimmedLastName) {
+      setError("First and last name are required")
+      setLoading(false)
+      return
+    }
 
     if (password !== confirmPassword) {
       setError("Passwords do not match")
@@ -59,9 +71,28 @@ export default function RegisterPage() {
       return
     }
 
-    if (data.user) {
-      setSuccess(true)
+    if (!data.user?.id || !data.user.email) {
+      setError("Registration succeeded, but profile creation failed. Please sign in.")
+      setLoading(false)
+      return
     }
+
+    try {
+      await createUserProfile({
+        id: data.user.id,
+        email: data.user.email,
+        role,
+        firstName: trimmedFirstName,
+        lastName: trimmedLastName,
+      })
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create user profile")
+      setLoading(false)
+      return
+    }
+
+    setSuccess(true)
+    setLoading(false)
   }
 
   if (success) {
@@ -130,6 +161,22 @@ export default function RegisterPage() {
                   <span>{error}</span>
                 </div>
               )}
+              <Input
+                label="First Name"
+                type="text"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                placeholder="Juan"
+                required
+              />
+              <Input
+                label="Last Name"
+                type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                placeholder="Dela Cruz"
+                required
+              />
               <Input
                 label="Email"
                 type="email"

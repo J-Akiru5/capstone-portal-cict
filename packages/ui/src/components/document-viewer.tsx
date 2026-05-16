@@ -17,18 +17,25 @@ export function DocumentViewer({ htmlContent, className, onParagraphClick, isAnn
   React.useEffect(() => {
     if (!isAnnotationMode || !contentRef.current) return
 
-    const paragraphs = contentRef.current.querySelectorAll("p, h1, h2, h3, h4")
+    const paragraphs = Array.from(contentRef.current.querySelectorAll("p, h1, h2, h3, h4"))
+    const cleanupHandlers: Array<() => void> = []
+
     paragraphs.forEach((p, index) => {
-      p.setAttribute("data-paragraph-id", `p-${index}`)
+      const paragraphId = `p-${index}`
+      p.setAttribute("data-paragraph-id", paragraphId)
       p.classList.add("cursor-pointer", "hover:bg-primary/5", "transition-colors", "relative", "group")
-      
+
       const clickHandler = () => {
-        onParagraphClick?.(`p-${index}`, p.textContent || "")
+        onParagraphClick?.(paragraphId, p.textContent || "")
       }
-      
+
       p.addEventListener("click", clickHandler)
-      return () => p.removeEventListener("click", clickHandler)
+      cleanupHandlers.push(() => p.removeEventListener("click", clickHandler))
     })
+
+    return () => {
+      cleanupHandlers.forEach((cleanup) => cleanup())
+    }
   }, [htmlContent, isAnnotationMode, onParagraphClick])
 
   return (
