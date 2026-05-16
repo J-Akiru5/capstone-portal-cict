@@ -3,6 +3,28 @@
 > **Client:** ISUFST — CICT, Dingle Campus
 > **Stack:** Turborepo · Next.js 15 (App Router) · Prisma · Supabase (Auth, Storage, PostgreSQL) · PWA
 > **Branding:** Maroon & Gold academic aesthetic
+> **Status:** ~65% complete — Architecture, Auth, DB schema, core UI, landing page done
+> **Last Updated:** May 16, 2026
+
+---
+
+## Current Status
+
+| Area | Status | Notes |
+|---|---|---|
+| Monorepo structure | ✅ Done | Turborepo, pnpm workspaces, 7 packages |
+| Database schema | ✅ Done | 15 models, 11 enums, all relations wired |
+| Supabase Auth | ✅ Done | `@supabase/ssr`, RBAC middleware, login + register |
+| UI components | ✅ Partial | Button, Card, Badge, DocumentViewer, FileUpload done |
+| Landing page | ✅ Done | Redesigned with nav, hero, stats, features, CTA, footer |
+| Student routes | ⚠️ Partial | Dashboard, documents, milestones, title-check done |
+| Faculty routes | ⚠️ Partial | Dashboard, evaluation pages done |
+| Admin routes | ⚠️ Partial | Dashboard (charts), rubrics (read-only), defense-schedule (mock) |
+| PWA | ❌ Not wired | `@serwist/next` installed but not configured |
+| Tests | ❌ None | Zero test files |
+| Vercel deployment | ✅ Configured | `vercel.json` with `rootDirectory: apps/web` |
+
+See [`IMPLEMENTATION_REPORT.md`](./IMPLEMENTATION_REPORT.md) for the full audit.
 
 ---
 
@@ -14,43 +36,67 @@
 capstone-portal/
 ├── apps/
 │   └── web/                         # Single Next.js 15 app (App Router + RSC)
-│       ├── public/                  # PWA manifest, icons, SW
+│       ├── public/                  # PWA manifest, icons (SW not yet configured)
+│       ├── .env / .env.local        # Supabase + DB credentials (gitignored)
 │       ├── src/
 │       │   ├── app/
-│       │   │   ├── (public)/        # Landing, Archive, Login
-│       │   │   ├── (auth)/          # Login, Register
+│       │   │   ├── page.tsx         # Landing page (nav, hero, stats, features, CTA, footer)
+│       │   │   ├── login/           # Email/password login
+│       │   │   ├── register/        # Registration with role selection
+│       │   │   ├── archive/         # Public archive listing + detail
 │       │   │   ├── student/         # Student workspace
 │       │   │   ├── faculty/         # Adviser & Panel workspace
 │       │   │   └── admin/           # Admin dashboard
-│       │   ├── components/          # App-specific composed components
-│       │   ├── hooks/               # Custom React hooks
-│       │   ├── lib/                 # Utilities, constants, helpers
-│       │   └── styles/              # Global CSS + design tokens
+│       │   ├── middleware.ts        # RBAC route protection
+│       │   └── globals.css          # App-specific styles
 │       └── next.config.ts
 ├── packages/
-│   ├── ui/                          # Shared UI primitives (Button, Card, Modal, etc.)
-│   ├── database/                    # Prisma schema, client, seed scripts
-│   ├── storage/                     # Supabase Storage utilities
-│   ├── auth/                        # Auth helpers, RBAC guards
-│   └── config/                      # Shared tsconfig, eslint configs
+│   ├── ui/                          # Shared UI primitives (Button, Card, Badge, etc.)
+│   ├── database/                    # Prisma schema, client, seed scripts, pg_trgm setup
+│   ├── storage/                     # Supabase Storage + mammoth DOCX→HTML converter
+│   ├── auth/                        # Supabase SSR auth (client.ts + server.ts split)
+│   ├── eslint-config/               # Shared ESLint flat config
+│   └── typescript-config/           # Shared tsconfig presets
 ├── turbo.json
+├── vercel.json                      # Vercel deployment config
 └── package.json
 ```
 
-> [!IMPORTANT]
-> **Styling Decision:** Given the project scale (responsive + PWA + multiple dashboards + dark mode), I recommend **Tailwind CSS v4** over vanilla CSS. Your existing monorepo projects (obbo, ICTIRC) already use Tailwind, ensuring pattern consistency. Please confirm or override.
+> [!NOTE]
+> **Styling:** Tailwind CSS v4 confirmed. Maroon (`#800000`) / Gold (`#FFD700`) theme active.
+> **Config split:** `packages/config/` was split into `eslint-config/` + `typescript-config/` for cleaner separation.
 
 ---
 
 ### Route Map
 
-| Route Group | Key Pages | Access |
-|---|---|---|
-| `(public)` | `/` landing, `/archive` search, `/archive/[id]` detail | Public |
-| `(auth)` | `/login`, `/register` | Unauthenticated |
-| `student/*` | `dashboard`, `group`, `project/documents`, `project/milestones`, `project/title-check`, `project/panel`, `project/defense/[stage]` | `STUDENT` |
-| `faculty/*` | `dashboard`, `advised/[groupId]`, `panels/[projectId]`, `evaluate/[projectId]/[stage]`, `annotations/[versionId]` | `FACULTY` |
-| `admin/*` | `dashboard` (analytics), `users`, `projects`, `groups`, `rubrics`, `defense-schedule`, `archive`, `settings` | `ADMIN` |
+| Route | Key Pages | Access | Status |
+|---|---|---|---|
+| `/` | Landing page (nav, hero, stats, features, CTA, footer) | Public | ✅ Done |
+| `/login` | Email/password login | Auth page | ✅ Done |
+| `/register` | Registration with role selection | Auth page | ✅ Done |
+| `/archive` | Public archive listing with search | Public | ✅ Done |
+| `/archive/[id]` | Project detail page | Public | ✅ Done |
+| `student/dashboard` | Student overview | `STUDENT` | ✅ Done |
+| `student/project/documents` | Document upload & version list | `STUDENT` | ✅ Done |
+| `student/project/documents/view/[id]` | DOCX viewer with HTML rendering | `STUDENT` | ✅ Done |
+| `student/project/milestones` | Kanban board (3 columns) | `STUDENT` | ️ Partial |
+| `student/project/title-check` | Trigram similarity search | `STUDENT` | ✅ Done |
+| `student/group` | Group creation & member management | `STUDENT` | ❌ Missing |
+| `student/project/panel` | Panel nomination workflow | `STUDENT` | ❌ Missing |
+| `student/project/defense/[stage]` | Defense stage detail | `STUDENT` | ❌ Missing |
+| `faculty/dashboard` | Advised groups + panel assignments | `FACULTY` | ✅ Done |
+| `faculty/evaluate/[versionId]` | Document annotation interface | `FACULTY` | ⚠️ Partial |
+| `faculty/evaluate/project/[projectId]` | Project evaluation overview | `FACULTY` | ⚠️ Partial |
+| `faculty/advised/[groupId]` | Advised group detail | `FACULTY` | ❌ Missing |
+| `admin/dashboard` | Analytics with 3 charts + overview cards | `ADMIN` | ✅ Done |
+| `admin/rubrics` | Rubric viewer (read-only) | `ADMIN` | ⚠️ Partial |
+| `admin/defense-schedule` | Static calendar + mock schedule list | `ADMIN` | ️ Partial |
+| `admin/users` | User management | `ADMIN` | ❌ Missing |
+| `admin/projects` | Project management | `ADMIN` | ❌ Missing |
+| `admin/groups` | Group management | `ADMIN` | ❌ Missing |
+| `admin/archive` | Admin archive management | `ADMIN` | ❌ Missing |
+| `admin/settings` | System settings | `ADMIN` | ❌ Missing |
 
 ---
 
@@ -310,209 +356,235 @@ Using `@serwist/next` (modern successor to `next-pwa`):
 
 ### Key Libraries
 
-| Library | Purpose |
-|---|---|
-| `mammoth` | .docx → HTML conversion (server-side) |
-| `react-pdf` | PDF viewing in browser |
-| `@hello-pangea/dnd` | Kanban drag-and-drop |
-| `recharts` | Analytics charts |
-| `@serwist/next` | PWA service worker |
-| `zod` | Schema validation |
-| `react-hook-form` | Form state management |
-| `lucide-react` | Icon library |
-| `date-fns` | Date formatting |
+| Library | Status | Purpose |
+|---|---|---|
+| `mammoth` | ✅ Installed | .docx → HTML conversion (server-side) |
+| `react-pdf` | ❌ Missing | PDF viewing in browser |
+| `@hello-pangea/dnd` | ✅ Installed | Kanban drag-and-drop |
+| `recharts` | ✅ Installed | Analytics charts |
+| `@serwist/next` | ⚠️ Installed, not wired | PWA service worker |
+| `zod` | ❌ Missing | Schema validation |
+| `react-hook-form` | ❌ Missing | Form state management |
+| `lucide-react` | ✅ Installed | Icon library |
+| `date-fns` | ✅ Installed | Date formatting |
+| `sonner` | ✅ Installed | Toast notifications |
 
 ---
 
 ## Phase Breakdown
 
-### Phase 1: Architecture & Security (Weeks 1-2)
+### Phase 1: Architecture & Security — ✅ COMPLETE
 
-#### [NEW] Turborepo Initialization
+#### Turborepo Initialization — ✅ Done
 - `turbo.json`, root `package.json`, `pnpm-workspace.yaml`
-- Shared `tsconfig`, `eslint` in `packages/config/`
+- Shared configs split into `packages/eslint-config/` + `packages/typescript-config/`
 
-#### [NEW] `apps/web` — Next.js 15 App
-- App Router with route groups: `(public)`, `(auth)`, `student/`, `faculty/`, `admin/`
+#### `apps/web` — Next.js 15 App — ✅ Done
+- App Router with route groups: `student/`, `faculty/`, `admin/`
 - Global layout with maroon/gold design tokens, Inter/Outfit typography
-- PWA manifest + service worker setup via `@serwist/next`
-- Responsive shell: collapsible sidebar (desktop) → bottom nav (mobile)
+- Landing page redesigned: nav, hero, stats, features, CTA, footer
+- Responsive layout
 
-#### [NEW] `packages/auth`
-- Supabase Auth client utilities
+#### `packages/auth` — ✅ Done
+- Supabase Auth client utilities (`client.ts` + `server.ts` split)
 - `middleware.ts` — RBAC route protection: redirect by role, block unauthorized access
-- `useSession` hook, `requireRole()` server-side guard
+- Login + Register pages with Supabase email/password auth
 
-#### [NEW] `packages/ui`
-- Design system primitives: Button, Input, Card, Modal, Badge, Tabs, Avatar, Dropdown
-- Maroon/gold theme with dark mode support
-- `<DocumentViewer>` shell component (Phase 3)
+#### `packages/ui` — ✅ Partial
+- Design system primitives: Button, Card, Badge, DocumentViewer, FileUpload
+- Maroon/gold theme via Tailwind v4 `@theme` directive
+- Missing: Input, Modal, Tabs, Avatar, Dropdown
 
-#### [NEW] `packages/database`
-- Full Prisma schema (all models listed above)
-- Raw SQL migration for `pg_trgm` extension + GIN index
+#### `packages/database` — ✅ Done
+- Full Prisma schema (15 models, 11 enums)
+- Raw SQL migration for `pg_trgm` extension + GIN index (`setup-pg-trgm.ts`)
 - Prisma Client singleton export
+- Seed script with basic data (3 faculty, 5 students, 1 group, 1 project, 6 titles, 4 rubrics)
 
-#### [NEW] `packages/storage`
+#### `packages/storage` — ✅ Done
 - Supabase Storage client for `manuscripts` and `avatars` buckets
-- Upload, download, delete utilities with RLS-aware paths
+- Upload, download, delete utilities
+- `mammoth.js` DOCX→HTML conversion
+- Bucket setup script
 
 ---
 
-### Phase 2: Core Data Layer & Search (Weeks 3-4)
+### Phase 2: Core Data Layer & Search — ️ Partial
 
-#### [NEW] Database Seed Script (`packages/database/seed.ts`)
-- 5 faculty users (1 dean, 1 program chair, 3 instructors)
-- 15 student users across 3 groups
-- 3 sample capstone projects with titles
-- 50+ historical titles for pg_trgm testing (mix of agriculture, aquaculture, campus automation)
-- Default rubric templates for all 4 defense stages
+#### Database Seed Script — ️ Partial
+- ✅ 3 faculty users (1 dean, 1 chair, 1 instructor) — plan called for 5
+- ✅ 5 student users in 1 group — plan called for 15 across 3 groups
+- ✅ 1 sample project — plan called for 3
+-  6 historical titles — plan called for 50+
+- ✅ Default rubrics for all 4 defense stages
 
-#### [NEW] Title Verification API (`apps/web/src/app/api/title-check`)
-- Server Action: accepts query title → runs `search_similar_titles()` via `prisma.$queryRaw`
-- Returns ranked results with similarity scores + color-coded severity
-- Debounced frontend input with live results
+#### Title Verification — ✅ Done
+- ✅ Server Action: `search_similar_titles()` via `prisma.$queryRawUnsafe`
+- ✅ Debounced frontend input with live results
+- ⚠️ Thresholds: API uses 0.2, UI uses 0.4/0.7 (plan specified 0.3/0.5/0.7)
 
-#### [NEW] User Registration Flow
-- Role selection (Student / Faculty)
-- Student: name, email, student number
-- Faculty: name, email, position selection
-- Supabase Auth signup → DB record creation via webhook or Server Action
-- Admin approval gate for faculty accounts (optional, confirm needed)
+#### User Registration Flow — ✅ Done
+- ✅ Role selection (Student / Faculty / Admin)
+- ✅ Supabase Auth signup with `user_metadata.role`
+- ✅ Middleware redirects logged-in users away from auth pages
 
 ---
 
-### Phase 3: Capstone Workspace (Weeks 5-6)
+### Phase 3: Capstone Workspace — ⚠️ Partial
 
-#### [NEW] Group Management (`student/group`)
+#### Group Management (`student/group`) — ❌ Not started
 - Create group: leader invites 3-4 members by email/student number
 - Join group: accept/decline invitation
 - Admin fallback: `admin/groups` page to manually assign students
 
-#### [NEW] Document Repository (`student/project/documents`)
-- Upload interface: drag-and-drop `.docx`/`.pdf` with validation
-- Server Action: upload to Supabase Storage → run mammoth conversion → save version record
-- Version history: list of all versions with download, view, and rollback
-- "View Document" opens `<DocumentViewer>` with rendered HTML
+#### Document Repository (`student/project/documents`) — ✅ Done
+- ✅ Upload interface: drag-and-drop `.docx`/`.pdf` with validation
+- ✅ Server Action: upload → mammoth conversion → save version record
+- ✅ Version history: list of all versions with download, view
+- ✅ "View Document" opens `<DocumentViewer>` with rendered HTML
 
-#### [NEW] Kanban Milestone Tracker (`student/project/milestones`)
-- Default columns: TODO → In Progress → For Review → Done
-- Pre-populated milestones per project (Chapter 1, Chapter 2, Methodology, System Dev, Testing, Manuscript)
-- Drag-and-drop reordering via `@hello-pangea/dnd`
-- Due dates, assignee (group member), completion tracking
+#### Kanban Milestone Tracker (`student/project/milestones`) — ️ Partial
+- ✅ Drag-and-drop reordering via `@hello-pangea/dnd`
+- ⚠️ Only 3 columns (TODO, IN_PROGRESS, DONE) — plan calls for 4 (missing FOR_REVIEW)
+- ⚠️ Due dates displayed but no date picker
+- ❌ No assignee per milestone
 
-#### [NEW] Panel Nomination (`student/project/panel`)
+#### Panel Nomination (`student/project/panel`) — ❌ Not started
 - Search faculty directory → nominate 3 panelists
 - View mandatory panelists (chair + dean) — auto-assigned
 - Track confirmation status per panelist
 - Adviser approval step before invitations go out
 
-#### [NEW] Title Proposal Interface (`student/project/title-check`)
-- Form: proposed title + brief description
-- Live trigram search with severity badges
-- "Submit for Approval" → creates title proposal for adviser review
-- Adviser can approve / request revision
+#### Title Proposal Interface (`student/project/title-check`) — ✅ Done
+- ✅ Form: proposed title + brief description
+- ✅ Live trigram search with severity badges
+- ⚠️ "Submit for Approval" flow not fully wired
 
 ---
 
-### Phase 4: Evaluation & Feedback (Weeks 7-8)
+### Phase 4: Evaluation & Feedback — ️ Partial
 
-#### [NEW] Document Annotation System (`faculty/annotations/[versionId]`)
-- `<DocumentViewer>`: renders mammoth HTML with paragraph indexing
-- Text selection → annotation popover (type, comment)
-- Annotation sidebar: threaded comments per paragraph
-- Filter controls: by type, status, author
-- Student view: read-only annotations with "Addressed" toggle
+#### Document Annotation System (`faculty/evaluate/[versionId]`) — ⚠️ Partial
+- ✅ `<DocumentViewer>`: renders mammoth HTML with paragraph indexing
+- ✅ Text selection → annotation popover (type, comment)
+- ✅ Annotation sidebar: comments per paragraph
+- ⚠️ Filter controls: UI exists but not fully wired
+- ✅ Student view: read-only annotations with "Addressed" toggle
 
-#### [NEW] Rubric Builder (`admin/rubrics`)
-- CRUD interface for rubric templates
-- Add/remove/reorder criteria within categories
-- Weight validation (must sum to 100%)
-- Activate/deactivate rubrics per defense stage
-- Preview mode: see rubric as panelists will see it
+#### Rubric Builder (`admin/rubrics`) — ️ Partial
+- ✅ View rubrics per stage (read-only)
+- ✅ Weight validation (shows error when weights don't sum to 100%)
+- ❌ CRUD interface: buttons exist but non-functional
+- ❌ Activate/deactivate toggle
+- ❌ Preview-as-panelist mode
 
-#### [NEW] Defense Grading (`faculty/evaluate/[projectId]/[stage]`)
-- Digital scoresheet: criteria listed with sliders/inputs (0 to max_score)
-- Per-criteria comment field
-- Auto-computed weighted total
-- Verdict selection: PASS / CONDITIONAL / FAIL
-- Submit locks the evaluation (no edits after submission)
+#### Defense Grading (`faculty/evaluate/project/[projectId]`) — ⚠️ Partial
+- ⚠️ Digital scoresheet UI exists but not fully wired
+- ⚠️ Auto-computed weighted total: logic exists but not connected to UI
+- ⚠️ Verdict selection: UI exists but submission not wired
+-  Submit locks evaluation
 
-#### [NEW] Defense Scheduling (`admin/defense-schedule`)
-- Calendar view: schedule defenses with date, time, venue
-- Assign project + defense stage
-- Auto-notify all panelists and group members
-- Status tracking: Scheduled → In Progress → Completed
-
----
-
-### Phase 5: Archive & Analytics (Weeks 9-10)
-
-#### [NEW] Analytics Dashboard (`admin/dashboard`)
-- **Cohort Velocity:** line chart of project stage distribution over time
-- **Domain Distribution:** pie/donut chart (agriculture, aquaculture, etc.)
-- **Defense Pass Rates:** bar chart per stage
-- **Deliverable Delays:** heatmap of overdue milestones
-- **Active Users:** student/faculty engagement metrics
-- All charts via `recharts` with maroon/gold palette
-
-#### [NEW] Public Archive (`/archive`)
-- Server-side rendered, SEO-optimized listing of completed projects
-- Search by: title keywords, tech stack, domain, year, author
-- Project detail page: title, abstract, authors, tech stack, domain, adviser, panel
-- Download full manuscript PDF (if `isPublic = true`)
-- pg_trgm-powered search for fuzzy title matching
+#### Defense Scheduling (`admin/defense-schedule`) — ⚠️ Partial
+- ⚠️ Calendar view: static grid hardcoded to May 2026
+- ️ Schedule list: mock data (2 hardcoded entries), not from DB
+- ❌ DB integration: no queries to `DefenseSchedule` model
+- ❌ Auto-notify panelists
+- ❌ Status tracking (Scheduled → In Progress → Completed)
 
 ---
 
-### Phase 6: QA, Optimization & Deployment (Weeks 11-12)
+### Phase 5: Archive & Analytics — ️ Partial
+
+#### Analytics Dashboard (`admin/dashboard`) — ✅ Partial
+- ✅ Overview cards: Total Projects, Students, Faculty, Completion Rate
+- ✅ Cohort Velocity (AreaChart)
+- ✅ Domain Distribution (PieChart/donut)
+- ✅ Defense Pass Rates (BarChart)
+- ❌ Deliverable Delays heatmap
+- ❌ Active Users engagement metrics
+
+#### Public Archive (`/archive`) — ️ Partial
+- ✅ SSR listing with search (query + domain filter)
+- ✅ Project detail page: full details, team, panel
+- ❌ pg_trgm-powered fuzzy search: uses basic `contains`, not `search_similar_titles`
+- ❌ Download manuscript: button exists but non-functional
+- ⚠️ SEO: basic metadata, no OG tags
+
+---
+
+### Phase 6: QA, Optimization & Deployment — ❌ Not started
 
 #### Testing Strategy
-- **Unit:** Zod schema validation, grade computation logic, similarity scoring
-- **Integration:** Server Actions (upload → version → annotate pipeline), auth flows
-- **E2E:** Full defense lifecycle (proposal → panel → upload → annotate → grade)
-- **Browser:** PWA install prompt, offline page, responsive breakpoints
+- ❌ **Unit:** No test files, no `test` scripts
+- ❌ **Integration:** No test files
+-  **E2E:** No Playwright config or tests
+- ❌ **Browser:** PWA not configured
 
 #### Performance Optimization
-- React Server Components for all data-heavy pages
-- Dynamic imports for heavy components (DocumentViewer, Recharts)
-- Image optimization via `next/image`
-- DB query optimization: proper indexes, pagination, select projections
-- Supabase Storage: signed URLs with expiry for manuscript downloads
+- ✅ React Server Components for data-heavy pages
+- ️ Dynamic imports: not applied to heavy components
+- ✅ Image optimization via `next/image` (configured in next.config.ts)
+- ⚠️ DB query optimization: basic queries, no pagination yet
+- ❌ Signed URLs with expiry for manuscript downloads
 
 #### Deployment
-- **Vercel:** Next.js deployment with environment variables
-- **Supabase Cloud:** New dedicated project, production-mode settings
-- **Domain:** Configure custom domain + SSL
-- **PWA:** Validate Lighthouse PWA audit score ≥ 90
+- ✅ **Vercel:** `vercel.json` configured with `rootDirectory: apps/web`
+- ✅ **Supabase Cloud:** Project exists, env vars configured
+- ❌ **Domain:** No custom domain configured
+- ❌ **PWA:** Lighthouse PWA audit not run (PWA not wired)
 
 ---
 
 ## Open Questions
 
-> [!IMPORTANT]
-> **Tailwind CSS:** The plan assumes Tailwind CSS v4 for styling. If you prefer vanilla CSS, the timeline will need to extend by ~2 weeks for the responsive/dark-mode/PWA work. Please confirm.
+> [!NOTE]
+> **Resolved:** Tailwind CSS v4 confirmed and active. Maroon/gold theme working.
+> **Resolved:** Faculty registration uses direct signup (no admin approval gate).
+> **Resolved:** Vercel deployment configured with `rootDirectory: apps/web`.
 
 > [!IMPORTANT]
-> **Faculty Registration Approval:** Should faculty accounts require admin approval before activation, or is email verification sufficient? This affects the auth flow complexity.
+> **Faculty Registration Approval:** Currently direct signup. Should faculty accounts require admin approval before activation? This affects the auth flow complexity.
 
 > [!NOTE]
-> **Notification Delivery:** The plan includes an in-app notification system. Do you also want email notifications (e.g., panel invitation, defense scheduled)? This would require a transactional email service (Resend, SendGrid, or Supabase Edge Functions).
+> **Notification Delivery:** The `Notification` model exists but no delivery mechanism. Do you want email notifications (panel invitation, defense scheduled)? This would require a transactional email service (Resend, SendGrid, or Supabase Edge Functions).
 
 > [!NOTE]
-> **Academic Year Scoping:** Should the portal support multiple academic years simultaneously (e.g., current cohort + previous cohorts visible), or is it strictly one active cohort at a time?
+> **Academic Year Scoping:** The `Semester` enum is missing from the schema. Should the portal support multiple academic years simultaneously, or is it strictly one active cohort at a time?
+
+> [!NOTE]
+> **PDF Viewing:** `react-pdf` is not installed. PDFs currently show a placeholder. Should we add PDF rendering support?
+
+> [!NOTE]
+> **Dark Mode:** Only light theme is defined. Should dark mode be added?
 
 ---
 
 ## Verification Plan
 
 ### Automated Tests
-- `pnpm test` — unit tests for grade computation, similarity thresholds, validation schemas
-- `pnpm test:e2e` — Playwright tests for auth flow, document upload, defense grading
-- Lighthouse CI — PWA audit, performance, accessibility scores
+- ❌ `pnpm test` — no unit tests written (grade computation, similarity thresholds, validation schemas)
+- ❌ `pnpm test:e2e` — no Playwright tests (auth flow, document upload, defense grading)
+- ❌ Lighthouse CI — PWA audit, performance, accessibility scores not run
 
 ### Manual Verification
-- Complete defense lifecycle walkthrough (student → faculty → admin)
-- Mobile responsiveness on actual devices (iOS Safari, Android Chrome)
-- PWA install + offline behavior testing
-- pg_trgm similarity testing with real-world title variations
+- ✅ Build passes: `pnpm build` completes with zero errors
+- ✅ Local dev: `pnpm dev` runs on `http://localhost:3000`
+- ✅ Vercel: `vercel.json` configured, env vars set
+- ⚠️ Auth flow: login + register pages work, but no test users seeded yet
+- ⚠️ Document upload: UI works, but Supabase Storage buckets need to be created
+- ️ Annotation system: UI renders, but full workflow not tested
+- ❌ PWA: not wired up, install prompt won't work
+- ❌ Mobile responsiveness: not tested on actual devices
+- ❌ pg_trgm similarity: not tested with real-world title variations
+
+### Pre-Production Checklist
+- [ ] Wire up `@serwist/next` in `next.config.ts` + create `sw.ts`
+- [ ] Add `zod` + `react-hook-form` to all forms
+- [ ] Fix Prisma env var alignment (`DATABASE_URL` vs `NEXT_POSTGRES_PRISMA_URL`)
+- [ ] Add `Semester` enum to schema
+- [ ] Install `react-pdf` for PDF viewing
+- [ ] Expand seed data (50+ titles, 3 groups, 15 students, 3 projects)
+- [ ] Add unit tests for grade computation, similarity scoring, validation
+- [ ] Add E2E tests with Playwright
+- [ ] Run Lighthouse PWA audit (target ≥ 90)
+- [ ] Test on iOS Safari + Android Chrome
