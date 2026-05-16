@@ -34,6 +34,18 @@ export async function middleware(req: NextRequest) {
 
   const url = req.nextUrl.clone()
 
+  // Redirect logged-in users away from auth pages
+  const authPages = ["/login", "/register"]
+  const isAuthPage = authPages.includes(url.pathname)
+
+  if (session && isAuthPage) {
+    const role = session.user.user_metadata.role
+    if (role === "ADMIN") url.pathname = "/admin/dashboard"
+    else if (role === "FACULTY") url.pathname = "/faculty/dashboard"
+    else url.pathname = "/student/dashboard"
+    return NextResponse.redirect(url)
+  }
+
   // Protect internal routes
   const protectedRoutes = ["/student", "/faculty", "/admin"]
   const isProtectedRoute = protectedRoutes.some((route) =>
@@ -69,5 +81,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/student/:path*", "/faculty/:path*", "/admin/:path*", "/login"],
+  matcher: ["/student/:path*", "/faculty/:path*", "/admin/:path*", "/login", "/register"],
 }
